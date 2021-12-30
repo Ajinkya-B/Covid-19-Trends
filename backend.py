@@ -183,10 +183,25 @@ def read_cpi_data(data: list[list[str]], month: date) -> dict:
     for row in data:
         dt = date(int(row[0].split('-')[0]), int(row[0].split('-')[1]), 1)
         if row[1] == 'Canada' and dt == month:
-            cpi[''.join([letter for letter in row[3] if letter.isalpha() or letter == ' '])] \
+            cpi[''.join([letter for letter in row[3] if letter.isalpha() or letter == ' '])]\
                 = float(row[10])
 
     return cpi
+
+
+def compute_csi(baskets: dict, cpi: dict) -> dict:
+    """Returns a dictionary containing the consumer spending index, which is calculated per
+    each commodity using basket data and the consumer price index.
+    """
+    csi = {}
+
+    for basket in baskets:
+        if basket == 'Allitems':
+            continue
+        csi[basket] = (baskets[basket].weight / 100.0) * cpi[basket]
+
+    csi['Total'] = sum(csi.values())
+    return csi
 
 
 if __name__ == '__main__':
