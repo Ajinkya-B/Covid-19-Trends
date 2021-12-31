@@ -204,6 +204,44 @@ def compute_csi(baskets: dict, cpi: dict) -> dict:
     return csi
 
 
+def predict_next_wave(data: list[Month], next_cases: list[int], category: str = 'Total') -> None:
+
+    cases = [m.covid_cases for m in data]
+    csi = [m.csi[category] for m in data]
+    predictor = Predictor(cases, csi)
+    start_date = data[-1].date
+
+    for count in next_cases:
+        start_date = start_date + relativedelta(months=1)
+        pred_csi = predictor.make_prediction(count)
+        month = Month(start_date, count, 0.0, {}, {}, {category: pred_csi})
+        data.append(month)
+
+
+def complete_dataset(data: list[Month]) -> None:
+
+    cases = []
+    csi = []
+
+    for month in data:
+        if month.csi['Total'] > 0.0:
+            cases.append(month.covid_cases)
+            csi.append(month.csi)
+
+    for category in csi[0]:
+        csi_for_category = [c[category] for c in csi]
+        predictor = Predictor(cases, csi_for_category)
+        for month in data:
+            if category not in month.csi:
+                month.csi[category] = predictor.make_prediction(month.covid_cases)
+            elif month.csi[category] <= 0.0:
+                month.csi['Predicted Total'] = predictor.make_prediction(month.covid_cases)
+
+    for month in data:
+        if month.csi['Total'] <= 0.0:
+            month.csi['Total'] = sum(month.csi.values()) - month.csi['Predicted Total']
+
+
 if __name__ == '__main__':
     import python_ta
     import python_ta.contracts
