@@ -205,7 +205,19 @@ def compute_csi(baskets: dict, cpi: dict) -> dict:
 
 
 def predict_next_wave(data: list[Month], next_cases: list[int], category: str = 'Total') -> None:
+    """Mutates given data by predicting another wave of cases
+    and adds new months to the list.
 
+    This function is not used in the final application due to
+    the unreliability of the model, and only remains as a
+    further demonstration of the capabilities of the Predictor class.
+    A full explanation on the flaws of the predictive model can be
+    found in the discussion section of the report.
+
+    Sample usage (based on the case counts from Oct. 2020 to Feb. 2021/'the second wave'):
+    >>> dt = load_data(date(2020, 3, 1), date(2021, 1, 1))
+    >>> predict_next_wave(dt, [76686, 142695, 203288, 198426, 87841])
+    """
     cases = [m.covid_cases for m in data]
     csi = [m.csi[category] for m in data]
     predictor = Predictor(cases, csi)
@@ -219,7 +231,8 @@ def predict_next_wave(data: list[Month], next_cases: list[int], category: str = 
 
 
 def complete_dataset(data: list[Month]) -> None:
-
+    """Fills in missing CSI values where data for computation is not
+    available using a predictive model based on existing data."""
     cases = []
     csi = []
 
