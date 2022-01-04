@@ -77,6 +77,32 @@ def normalize_data(filtered_data: pd.DataFrame, usr_choice: list) -> object:
     return list_so_far
 
 
+def line_graph(filtered_data: pd.DataFrame, usr_choice: list[str]) -> None:
+    """Normal Line Graph plotting function that takes user's choice of data to be displayed.
+
+    Sample Use:
+    # To display the line graph with covid cases and unemployenment rate with respect to time
+    >>> start_dt = date(2020, 3, 1)
+    >>> end_dt = date(2021, 2, 1)
+    >>> filtered_data = get_filtered_data(start_dt, end_dt) # apply users date filters on the data
+    >>> line_graph(filtered_data, ['covid_cases', 'unemployment_rate'])
+
+    # To display the line graph with all the attributes(except baskets) **
+    >>> line_graph(filtered_data, ['covid_cases', 'unemployment_rate', 'cpi', 'csi'])
+
+    """
+    fig = px.line(filtered_data, x="date", y=normalize_data(filtered_data, usr_choice),
+                  labels={"variable": "Category", "date": "Time"},
+                  title="Covid-Related Graphs")
+
+    for i in range(len(usr_choice)):
+        fig.data[i].name = usr_choice[i]
+        fig.data[i].hovertemplate = 'Category = ' \
+                                    + usr_choice[i] + '<br>date=%{x}<br>value=%{y}<extra></extra>'
+
+    fig.show()
+
+
 if __name__ == '__main__':
     import python_ta
     import python_ta.contracts
