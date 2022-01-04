@@ -103,6 +103,73 @@ def line_graph(filtered_data: pd.DataFrame, usr_choice: list[str]) -> None:
     fig.show()
 
 
+def animated_graph(filtered_data: pd.DataFrame, usr_choice: list[str]) -> None:
+    """Animated line graph plotting function takes user's choice of data to be displayed.
+
+       Sample Usage:
+       # NOTE: some lines are commented instead of written as doctests as otherwise
+        doctest.testmod() will cause browser windows to open with graphs
+       # To display the line graph with covid cases and unemployenment rate with respect to time
+       >>> start_dt = date(2020, 3, 1)
+       >>> end_dt = date(2021, 2, 1)
+       >>> filtered_data = get_filtered_data(start_dt, end_dt) # apply users date filters on the data
+       # animated_graph(filtered_data, ['covid_cases', 'unemployment_rate'])
+
+       # To display the line graph with all the attributes(except baskets) **
+       # animated_graph(filtered_data, ['covid_cases', 'unemployment_rate', 'cpi', 'csi'])
+    """
+
+    fig = px.scatter(filtered_data, x="date", y=normalize_data(filtered_data, usr_choice),
+                     animation_frame=[da.__str__() for da in filtered_data.date],
+                     range_x=(date(2020, 3, 1), date(2021, 10, 1)),
+                     range_y=(-0.5, 12),
+                     labels={"variable": "Category", "date": "Time"},
+                     title="Animated Covid-Related Graphs")
+
+    fig.layout.updatemenus[0].buttons[0].args[1]['frame']['duration'] = 1200
+    fig.layout.updatemenus[0].buttons[0].args[1]['transition']['duration'] = 1200
+    for i in range(len(usr_choice)):
+        fig.data[i].name = usr_choice[i]
+        fig.data[i]['marker'].update(size=14)
+        fig.data[i].hovertemplate = 'Category = ' \
+                                    + usr_choice[i] + '<br>date=%{x}<br>value=%{y}<extra></extra>'
+
+    pio.show(fig)
+
+
+def csi_bar_chart(filtered_data: pd.DataFrame) -> None:
+    """Bar Graph plotting function that takes user's choice of date range to be displayed.
+
+    Sample Use:
+       # To display the bar graph of subcatrgories of CSI.
+       # NOTE: some lines are commented instead of written as doctests as otherwise
+        doctest.testmod() will cause browser windows to open with graphs
+       >>> start_dt = date(2020, 3, 1)
+       >>> end_dt = date(2021, 2, 1)
+       >>> filtered_data = get_filtered_data(start_dt, end_dt) # apply users date filters on the data
+       # csi_bar_chart(filtered_data)
+    """
+
+    categories = ['Shelter', 'Food', 'Transportation',
+                  'Household operations furnishings and equipment',
+                  'Recreation education and reading', 'Health and personal care',
+                  'Alcoholic beverages tobacco products and recreational cannabis']
+
+    cat_values = [filtered_data.csi.str[cat].values.tolist() for cat in categories]
+
+    fig = px.bar(filtered_data, x='date', y=cat_values,
+                 labels={"variable": "Category", "date": "Time",
+                         "value": "Percentage spending compared to (2002)"},
+                 title="Change in CSI Categories in Relation to Time")
+
+    for i in range(len(categories)):
+        fig.data[i].name = categories[i]
+        fig.data[i].hovertemplate = 'Category = ' \
+                                    + categories[i] + '<br>date=%{x}<br>value=%{y}<extra></extra>'
+
+    fig.show()
+
+
 if __name__ == '__main__':
     import python_ta
     import python_ta.contracts
