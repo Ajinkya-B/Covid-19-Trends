@@ -79,3 +79,124 @@ ABOUT = pygame.transform.scale(ABOUT, (551, 250))
 # The theme_color list stores all the colors for each theme
 THEME_COLOR = [[TEAL, GRASS], [MID_RED, WHITE], [LIGHT_RED, RED],
                [PURPLE, LIGHT_PURPLE], [BLUE, LIGHT_BLUE], [DARK_PEACH, LIGHT_PEACH]]
+
+
+def display_theme_color(pos: tuple[int, int], theme_num: int) -> int:
+    """
+    Returns the proper theme color based on the mouse position
+    when the user clicks the mouse button.
+    """
+    theme_number = theme_num
+
+    if 30 <= pos[0] <= 60 and 130 <= pos[1] <= 160:
+        theme_number = 0
+    elif 75 <= pos[0] <= 105 and 130 <= pos[1] <= 160:
+        theme_number = 1
+    elif 120 <= pos[0] <= 150 and 130 <= pos[1] <= 160:
+        theme_number = 2
+    elif 30 <= pos[0] <= 60 and 178 <= pos[1] <= 218:
+        theme_number = 3
+    elif 75 <= pos[0] <= 105 and 178 <= pos[1] <= 218:
+        theme_number = 4
+    elif 120 <= pos[0] <= 150 and 178 <= pos[1] <= 218:
+        theme_number = 5
+
+    return theme_number
+
+
+def page_changer(pos: tuple[int, int], page_num: int, option: bool) -> tuple[int, bool]:
+    """
+    Returns the updated page number based on the mouse position
+    when the user clicks the mouse button.
+    """
+    page_number = page_num
+    update_option = option
+
+    if page_number == 0:
+        # This will transition to the about page
+        if 175 <= pos[0] <= 425 and 270 <= pos[1] <= 345:
+            page_number = 1
+            # This will transition to the graph page
+        elif 175 <= pos[0] <= 425 and 120 <= pos[1] <= 195:
+            page_number = 2
+
+            # This is responsible for making the option gui visible
+        elif 25 <= pos[0] <= 53 and 34 <= pos[1] <= 62:
+            if update_option:
+                update_option = False
+            else:
+                update_option = True
+
+    return (page_number, update_option)
+
+
+def mouse_click(pos: tuple[int, int], page: int, option_gui: bool, theme_number: int,
+                categories: list) -> tuple[tuple[int, int], int, bool, int, list]:
+    """
+    This function handles the mouse click event for all thew pages and updates
+    the variables accordingly using other helper functions.
+    """
+    position = pos
+    page_num = page
+    option = option_gui
+    theme = theme_number
+    category_list = categories
+    if page_num == 0:
+        # This will update the page number and the option_gui condition
+        page_num, option = page_changer(position, page_num, option)
+
+        # The following will change the theme color
+        if option:
+            theme = display_theme_color(position, theme)
+
+    elif page == 1:
+        if 35 <= pos[0] <= 100 and 440 <= pos[1] <= 467:
+            page_num = 0
+
+    elif page == 2:
+        if 47 <= pos[0] <= 211 and 65 <= pos[1] <= 109:
+            category_changer('covid_cases', category_list)
+
+        elif 47 <= pos[0] <= 211 and 145 <= pos[1] <= 189:
+            category_changer('cpi', category_list)
+
+        elif 47 <= pos[0] <= 211 and 225 <= pos[1] <= 269:
+            category_changer('csi', category_list)
+
+        elif 47 <= pos[0] <= 211 and 305 <= pos[1] <= 349:
+            category_changer('unemployment_rate', category_list)
+
+        elif 47 <= pos[0] <= 211 and 385 <= pos[1] <= 429:  # bar graph code
+            start_dt = START_DATE
+            end_dt = END_DATE
+            filtered_data = graph.get_filtered_data(start_dt, end_dt)
+            graph.csi_bar_chart(filtered_data)
+
+        elif 250 <= pos[0] <= 400 and 390 <= pos[1] <= 460 and category_list != []:
+            # submit_clicked = 1
+            start_dt = START_DATE
+            end_dt = END_DATE
+            filtered_data = graph.get_filtered_data(start_dt, end_dt)
+            graph.line_graph(filtered_data, category_list)
+
+        elif 430 <= pos[0] <= 580 and 390 <= pos[1] <= 460 and category_list != []:
+            # animate_clicked = 1
+            start_dt = START_DATE
+            end_dt = END_DATE
+            filtered_data = graph.get_filtered_data(start_dt, end_dt)
+            graph.animated_graph(filtered_data, category_list)
+
+    return (position, page_num, option, theme, category_list)
+
+
+def category_changer(category: str, category_list: list) -> list:
+    """
+    Returns the updated category list based on the existing
+    items in the category list.
+    """
+    if category not in category_list:
+        category_list.append(category)
+    else:
+        category_list.remove(category)
+
+    return category_list
