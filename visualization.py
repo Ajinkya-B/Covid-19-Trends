@@ -256,4 +256,141 @@ def draw_option_gui(draw: bool, theme_number: int) -> None:
         pygame.draw.rect(SCREEN, BLUE, [75, 178, 30, 30], 0)
         pygame.draw.rect(SCREEN, DARK_PEACH, [120, 178, 30, 30], 0)
 
-        theme_selector(theme_number)  
+        theme_selector(theme_number)
+
+
+def draw_submit_animate(pos: tuple[int, int], theme_number: int) -> None:
+    """
+    This function draws the submit and animate button in the first page.
+    """
+    x_value = [250, 430]
+    for i in x_value:
+        if i <= pos[0] <= i + 150 and 390 <= pos[1] <= 460:
+            pygame.draw.rect(SCREEN, THEME_COLOR[theme_number][1], [i, 390, 150, 70], 0)
+            pygame.draw.rect(SCREEN, G2, [i + 5, 395, 140, 60], 0)
+        else:
+            pygame.draw.rect(SCREEN, THEME_COLOR[theme_number][0], [i, 390, 150, 70], 0)
+            pygame.draw.rect(SCREEN, GREY, [i + 5, 395, 140, 60], 0)
+
+
+def page_three_buttons(categories: list, theme_number: int) -> None:
+    """
+    This function draws all the buttons for the third page.
+    """
+    full_category = ['covid_cases', 'cpi', 'csi', 'unemployment_rate', 'baskets']
+    y_value = [62, 142, 222, 302, 382]
+
+    for i in range(len(y_value)):
+        counter = 0
+        if full_category[i] in categories:
+            pygame.draw.rect(SCREEN, THEME_COLOR[theme_number][1],
+                             [44, y_value[i], 170, 50], 0)
+            pygame.draw.rect(SCREEN, G2, [47, y_value[i] + 3, 164, 44], 0)
+        else:
+            pygame.draw.rect(SCREEN, THEME_COLOR[theme_number][0],
+                             [44, y_value[i], 170, 50], 0)
+            pygame.draw.rect(SCREEN, GREY, [47, y_value[i] + 3, 164, 44], 0)
+        counter += 80
+
+
+def show_visual() -> None:
+    """
+    This is the main function that shows the visualization. The function does not
+    return anything, but only outputs the visual.
+
+    Sample usage:
+    Simply calling this function will output the visualization.
+    """
+    global START_DATE
+    global END_DATE
+    page, theme_number = 0, 0
+    done, option_gui = False, False
+    categories = []
+    s_date = input('Please input the start date of the graph YYYY, MM, DD '
+                   '(minimum: 2020, 3, 1): ').split(', ')
+    START_DATE = date(int(s_date[0]), int(s_date[1]), int(s_date[2]))
+    e_date = input('Please input the end date of the graph YYYY, MM, DD '
+                   '(maximum: 2021, 10, 1): ').split(', ')
+    END_DATE = date(int(e_date[0]), int(e_date[1]), int(e_date[2]))
+    while not done:
+        # This will get the mouse position
+        pos = pygame.mouse.get_pos()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
+
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                pos, page, option_gui, theme_number, categories = \
+                    mouse_click(pos, page, option_gui, theme_number, categories)
+
+        if page == 0:
+            # This fills the SCREEN with a specific color
+            SCREEN.fill(DARK_GREY)
+
+            # This creates the graph and about button
+            page_one_buttons(pos, theme_number)
+            SCREEN.blit(GRAPH1, [240, 137])
+            SCREEN.blit(ABOUT1, [240, 287])
+
+            # This will create the options tab
+            draw_option_gui(option_gui, theme_number)
+            if 25 <= pos[0] <= 53 and 34 <= pos[1] <= 62:
+                pygame.draw.rect(SCREEN, THEME_COLOR[theme_number][1], [25, 34, 28, 28], 2)
+            else:
+                pygame.draw.rect(SCREEN, THEME_COLOR[theme_number][0], [25, 34, 28, 28], 2)
+            SCREEN.blit(OPTION1, [30, 30])
+
+        elif page == 1:
+            # This fills the SCREEN with a specific color
+            SCREEN.fill(DARK_GREY)
+
+            # The following draws the border and the back button
+            pygame.draw.rect(SCREEN, THEME_COLOR[theme_number][0], [20, 20, 560, 460], 1)
+            pygame.draw.rect(SCREEN, THEME_COLOR[theme_number][1], [22, 22, 556, 456], 3)
+            SCREEN.blit(TEXT1, [35, 55])
+            SCREEN.blit(ABOUT, [25, 100])
+            SCREEN.blit(BACK2, [38, 437])
+
+        elif page == 2:
+            # This fills the SCREEN with a specific color
+            SCREEN.fill(DARK_GREY)
+            pygame.draw.rect(SCREEN, THEME_COLOR[theme_number][0], [29, 32, 202, 436], 3)
+            pygame.draw.rect(SCREEN, THEME_COLOR[theme_number][0], [245, 35, 335, 255], 3)
+            SCREEN.blit(PICTURE, [247, 37])
+
+            # The following creates the submit and animate button
+            draw_submit_animate(pos, theme_number)
+            SCREEN.blit(SUBMIT, [287, 412])
+            SCREEN.blit(ANIMATE, [461, 412])
+
+            # The follow creates all the buttons
+            page_three_buttons(categories, theme_number)
+            SCREEN.blit(GRAPH_BTN1, [58, 72])
+            SCREEN.blit(GRAPH_BTN2, [105, 152])
+            SCREEN.blit(GRAPH_BTN3, [105, 232])
+            SCREEN.blit(GRAPH_BTN4, [60, 319])
+            SCREEN.blit(GRAPH_BTN5, [90, 392])
+
+        pygame.display.flip()
+        CLOCK.tick(60)
+    pygame.display.quit()
+
+
+if __name__ == '__main__':
+    import python_ta
+
+    python_ta.check_all(config={
+        'max-line-length': 100,
+        'extra-imports': ['pygame', 'datetime', 'graph'],
+        'generated-members': ['pygame.*'],
+        'allowed-io': ['show_visual']
+    })
+
+    import python_ta.contracts
+
+    python_ta.contracts.check_all_contracts()
+    import doctest
+
+    doctest.testmod()
+
