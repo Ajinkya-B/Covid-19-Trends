@@ -200,3 +200,60 @@ def category_changer(category: str, category_list: list) -> list:
         category_list.remove(category)
 
     return category_list
+
+
+def theme_selector(number: int) -> None:
+    """
+    This function displays which theme color is selected currently
+    """
+    if number == 0:
+        pygame.draw.rect(SCREEN, WHITE, [30, 130, 30, 30], 2)
+    elif number == 1:
+        pygame.draw.rect(SCREEN, WHITE, [75, 130, 30, 30], 2)
+    elif number == 2:
+        pygame.draw.rect(SCREEN, WHITE, [120, 130, 30, 30], 2)
+    elif number == 3:
+        pygame.draw.rect(SCREEN, WHITE, [30, 178, 30, 30], 2)
+    elif number == 4:
+        pygame.draw.rect(SCREEN, WHITE, [75, 178, 30, 30], 2)
+    elif number == 5:
+        pygame.draw.rect(SCREEN, WHITE, [120, 178, 30, 30], 2)
+
+
+def page_one_buttons(pos: tuple[int, int], theme_number: int) -> None:
+    """
+    This function draws the graph and about button in the first page.
+    """
+    y_value = [120, 270]
+    for i in y_value:
+        if 175 <= pos[0] <= 425 and i <= pos[1] <= i + 75:
+            pygame.draw.rect(SCREEN, THEME_COLOR[theme_number][1], [170, i - 5, 260, 85], 1)
+            pygame.draw.rect(SCREEN, G2, [175, i, 250, 75], 0)
+        else:
+            pygame.draw.rect(SCREEN, THEME_COLOR[theme_number][0], [170, i - 5, 260, 85], 1)
+            pygame.draw.rect(SCREEN, GREY, [175, i, 250, 75], 0)
+
+
+def draw_option_gui(draw: bool, theme_number: int) -> None:
+    """
+    This function draws the option button and option gui in the first page.
+    """
+    if draw:
+        pygame.draw.rect(SCREEN, G2, [0, 0, 200, 500], 0)
+        pygame.draw.rect(SCREEN, THEME_COLOR[theme_number][0], [-2, -2, 200, 504], 4)
+
+        # These will create different theme option
+        SCREEN.blit(COLORS1, [20, 90])
+        pygame.draw.rect(SCREEN, DARK_GREY, [15, 120, 160, 100], 0)
+
+        # Row 1 for colors
+        pygame.draw.rect(SCREEN, TEAL, [30, 130, 30, 30], 0)
+        pygame.draw.rect(SCREEN, MID_RED, [75, 130, 30, 30], 0)
+        pygame.draw.rect(SCREEN, LIGHT_RED, [120, 130, 30, 30], 0)
+
+        # Row 2 for colors
+        pygame.draw.rect(SCREEN, PURPLE, [30, 178, 30, 30], 0)
+        pygame.draw.rect(SCREEN, BLUE, [75, 178, 30, 30], 0)
+        pygame.draw.rect(SCREEN, DARK_PEACH, [120, 178, 30, 30], 0)
+
+        theme_selector(theme_number)  
